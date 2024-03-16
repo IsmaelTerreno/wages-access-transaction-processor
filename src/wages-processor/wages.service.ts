@@ -8,6 +8,7 @@ import { ACCESS_REQUEST_REPOSITORY } from './access-request.repository';
 import { EmployeeData } from './employee-data.entity';
 import { AccessRequest } from './access-request.entity';
 import BigDecimal from 'big.js';
+import { AccessRequestDto } from './access-request.dto';
 
 @Injectable()
 export class WagesService {
@@ -19,10 +20,6 @@ export class WagesService {
     @Inject(ACCESS_REQUEST_REPOSITORY)
     private wageAccessRequestRepository: Repository<AccessRequest>,
   ) {}
-
-  getHello(): string {
-    return 'Hello World!';
-  }
 
   async getBalance(employeeID: string): Promise<number> {
     const employeeWageData: EmployeeData =
@@ -104,5 +101,35 @@ export class WagesService {
       }
       console.log('Saved employee:', savedEmployee);
     }
+  }
+
+  async requestAccess(accessRequest: AccessRequestDto) {
+    const employeeWageData: EmployeeData =
+      await this.employeeWageDataRepository.findOne({
+        where: {
+          employeeID: accessRequest.employeeID,
+        },
+        relations: {
+          wageAccessRequest: true,
+        },
+      });
+    const requestedAmount = this.sumRequestedAmounts(
+      employeeWageData.wageAccessRequest,
+    );
+    const balance = BigDecimal(
+      employeeWageData.totalEarnedWages - requestedAmount,
+    );
+    if (balance < accessRequest.requestedAmount) {
+      throw new Error('Insufficient balance');
+    }
+    const newAccessRequest: AccessRequest = {
+      id: undefined,
+      requestID: accessRequest.requestID,
+      employeeID: accessRequest.employeeID,
+      requestedAmount: parseFloat(accessRequest.requestedAmount.toFixed(2)),
+      requestedCurrency: accessRequest.requestedCurrency,
+      employeeWageData: employeeWageData,
+    };
+    return this.wageAccessRequestRepository.save(newAccessRequest);
   }
 }
