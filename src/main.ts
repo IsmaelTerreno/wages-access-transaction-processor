@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { WagesModule } from './wages-processor/wages.module';
 import * as dotenv from 'dotenv';
 import * as process from 'process';
-import { ValidationPipe } from "@nestjs/common";
+import { ValidationPipe } from '@nestjs/common';
 
 dotenv.config();
 
@@ -36,4 +36,5 @@ async function bootstrap() {
   );
   await app.listen(parseInt(process.env.SERVER_PORT_LISTENING) || 6030);
 }
+
 bootstrap();
