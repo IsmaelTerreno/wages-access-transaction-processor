@@ -1,7 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { EmployeeData } from './employee-data.entity';
 
 @Entity()
-export class WageAccessRequest {
+export class AccessRequest {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -16,4 +17,7 @@ export class WageAccessRequest {
 
   @Column({ nullable: false })
   requestedCurrency: string;
+
+  @ManyToOne(() => EmployeeData, (employee) => employee.wageAccessRequest)
+  employeeWageData: EmployeeData;
 }
