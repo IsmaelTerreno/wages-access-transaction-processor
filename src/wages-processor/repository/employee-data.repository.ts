@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 
-import { DATA_SOURCE } from '../database/database.providers';
-import { EmployeeData } from './employee-data.entity';
+import { DATA_SOURCE } from '../../database/database.providers';
+import { EmployeeData } from '../entity/employee-data.entity';
 
 export const EMPLOYEE_DATA_REPOSITORY = 'EMPLOYEE_DATA_REPOSITORY';
 export const EmployeeDataRepository = {

@@ -1,14 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import * as sampleData from '../../test/utils/sample_wage_data.json';
-import { CurrencyRates } from './currency-rates.entity';
-import { EMPLOYEE_DATA_REPOSITORY } from './employee-data.repository';
-import { CURRENCY_RATES_REPOSITORY } from './currency-rates.repository';
-import { ACCESS_REQUEST_REPOSITORY } from './access-request.repository';
-import { EmployeeData } from './employee-data.entity';
-import { AccessRequest } from './access-request.entity';
+import * as sampleData from '../../../test/utils/sample_wage_data.json';
+import { CurrencyRates } from '../entity/currency-rates.entity';
+import { EMPLOYEE_DATA_REPOSITORY } from '../repository/employee-data.repository';
+import { CURRENCY_RATES_REPOSITORY } from '../repository/currency-rates.repository';
+import { ACCESS_REQUEST_REPOSITORY } from '../repository/access-request.repository';
+import { EmployeeData } from '../entity/employee-data.entity';
+import { AccessRequest } from '../entity/access-request.entity';
 import BigDecimal from 'big.js';
-import { AccessRequestDto } from './access-request.dto';
+import { AccessRequestDto } from '../dto/access-request.dto';
 
 @Injectable()
 export class WagesService {

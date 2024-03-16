@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { WagesController } from './wages.controller';
-import { WagesService } from './wages.service';
+import { WagesController } from './controller/wages.controller';
+import { WagesService } from './service/wages.service';
 import { DatabaseModule } from '../database/database.module';
-import { CurrencyRatesRepository } from './currency-rates.repository';
-import { EmployeeDataRepository } from './employee-data.repository';
-import { AccessRequestRepository } from './access-request.repository';
+import { CurrencyRatesRepository } from './repository/currency-rates.repository';
+import { EmployeeDataRepository } from './repository/employee-data.repository';
+import { AccessRequestRepository } from './repository/access-request.repository';
 
 @Module({
   imports: [DatabaseModule],
