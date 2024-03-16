@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './wages-processor/app.module';
+import { WagesModule } from './wages-processor/wages.module';
 import * as dotenv from 'dotenv';
 import * as process from 'process';
 import { ValidationPipe } from "@nestjs/common";
@@ -18,7 +18,7 @@ export const getCORSConfig = () => {
 };
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create(WagesModule, {
     bufferLogs: true,
     rawBody: true,
     logger: ['error', 'warn', 'debug', 'log'],
