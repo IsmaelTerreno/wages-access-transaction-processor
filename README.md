@@ -60,10 +60,16 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Documentation
+
+The app already contains a swagger documentation for developers, you can access it by the following URL:
+
+`http://localhost:{Configured port}/doc`
+
 ## Support
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If
-you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+[Carlos Ismael Terreno](https://github.com/IsmaelTerreno) would be working on the issues that can be created. Thanks in
+advance for taking the time to review this project.
 
 ## Stay in touch
 

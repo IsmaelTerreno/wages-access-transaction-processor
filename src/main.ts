@@ -3,6 +3,7 @@ import { WagesModule } from './wages-processor/wages.module';
 import * as dotenv from 'dotenv';
 import * as process from 'process';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 dotenv.config();
 
@@ -34,7 +35,18 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  await app.listen(parseInt(process.env.SERVER_PORT_LISTENING) || 6030);
+  const config = new DocumentBuilder()
+    .setTitle('Wage Access Transaction Processor API')
+    .setDescription(
+      'This platform allows employees in LATAM countries working for US companies to access their earned wages in real-time before payday.',
+    )
+    .setVersion('1.0')
+    .addTag('Wages Processor')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('doc', app, document);
+  console.log('Server is running on port:', process.env.SERVER_PORT_LISTENING);
+  await app.listen(parseInt(process.env.SERVER_PORT_LISTENING));
 }
 
 bootstrap();
