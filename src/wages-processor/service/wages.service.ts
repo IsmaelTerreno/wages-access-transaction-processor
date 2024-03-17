@@ -136,4 +136,6 @@ export class WagesService {
     };
     return this.wageAccessRequestRepository.save(newAccessRequest);
   }
+
+  async registerCurrencyRate() {}
 }

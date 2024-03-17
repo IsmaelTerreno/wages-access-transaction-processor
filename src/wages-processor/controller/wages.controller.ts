@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { WagesService } from '../service/wages.service';
 import { AccessRequestDto } from '../dto/access-request.dto';
 import { ResponseApiDto } from '../dto/response-api.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Wages Processor')
 @Controller('/api/v1/wages')
@@ -12,6 +12,11 @@ export class WagesController {
   @ApiOperation({
     summary:
       'Load initial data for testing purposes, also will clean up the database data so take care when using it and should not be used in production.',
+  })
+  @ApiResponse({
+    description:
+      'Message response result from API when load initial data for testing purposes.',
+    type: ResponseApiDto,
   })
   @Get('/load-initial-data')
   async loadInitialData(): Promise<ResponseApiDto> {
@@ -31,6 +36,11 @@ export class WagesController {
   @ApiOperation({
     summary:
       "Calculate the real-time balance of an employee's earned wages, accounting for any previous wage access requests.",
+  })
+  @ApiResponse({
+    description:
+      'Message response result from API when calculate the real-time balance of an employee.',
+    type: ResponseApiDto,
   })
   @Get('/balance/:employeeId')
   async getBalance(
@@ -53,6 +63,11 @@ export class WagesController {
     summary:
       'Determine if a wage access request can be approved based on the available balance and the requested amount.',
   })
+  @ApiResponse({
+    description:
+      'Message response result from API when creates the wage access request.',
+    type: ResponseApiDto,
+  })
   @Post('/access-request')
   async requestAccess(
     @Body() accessRequest: AccessRequestDto,
@@ -65,6 +80,30 @@ export class WagesController {
     } catch (error) {
       return {
         message: 'Error requesting access',
+        data: error.message,
+      };
+    }
+  }
+
+  @ApiOperation({
+    summary:
+      'Register the currency rate for a specific currency, which will be used to convert the requested amount to the employee’s currency.',
+  })
+  @ApiResponse({
+    description:
+      'Message response result from API when register the currency rate.',
+    type: ResponseApiDto,
+  })
+  @Post('/register-currency-rate')
+  async registerCurrencyRate(): Promise<ResponseApiDto> {
+    try {
+      return {
+        message: 'Currency rate registered successfully',
+        data: await this.appService.registerCurrencyRate(),
+      };
+    } catch (error) {
+      return {
+        message: 'Error registering currency rate',
         data: error.message,
       };
     }
