@@ -161,4 +161,70 @@ describe('Wages API (e2e)', () => {
         ).toEqual(1170);
       });
   });
+
+  it('Should register a new currency update in the price', async () => {
+    const currencyRate = {
+      firstConversionTypeSymbol: 'USD',
+      secondConversionTypeSymbol: 'ARS',
+      exchangeRate: 150,
+    };
+    await request(app.getHttpServer())
+      .post(BASE_PATH_WAGES_PROCESSOR + '/register-currency-rate')
+      .send(currencyRate)
+      .then((result) => {
+        expect(result.statusCode).toEqual(201);
+        expect(result.body.data.exchangeRate).toEqual(150);
+      });
+  });
+
+  it('Should register a new currency update in the price more that one time', async () => {
+    await request(app.getHttpServer())
+      .post(BASE_PATH_WAGES_PROCESSOR + '/register-currency-rate')
+      .send({
+        firstConversionTypeSymbol: 'USD',
+        secondConversionTypeSymbol: 'ARS',
+        exchangeRate: 150,
+      })
+      .then((result) => {
+        expect(result.statusCode).toEqual(201);
+        expect(result.body.data.exchangeRate).toEqual(150);
+      });
+    await request(app.getHttpServer())
+      .post(BASE_PATH_WAGES_PROCESSOR + '/register-currency-rate')
+      .send({
+        firstConversionTypeSymbol: 'USD',
+        secondConversionTypeSymbol: 'ARS',
+        exchangeRate: 200,
+      })
+      .then((result) => {
+        expect(result.statusCode).toEqual(201);
+        expect(result.body.data.exchangeRate).toEqual(200);
+      });
+    await request(app.getHttpServer())
+      .post(BASE_PATH_WAGES_PROCESSOR + '/register-currency-rate')
+      .send({
+        firstConversionTypeSymbol: 'USD',
+        secondConversionTypeSymbol: 'ARS',
+        exchangeRate: 300,
+      })
+      .then((result) => {
+        expect(result.statusCode).toEqual(201);
+        expect(result.body.data.exchangeRate).toEqual(300);
+      });
+  });
+
+  it('Should register a new currency rate', async () => {
+    const currencyRate = {
+      firstConversionTypeSymbol: 'BTC',
+      secondConversionTypeSymbol: 'ARS',
+      exchangeRate: 60000.36,
+    };
+    await request(app.getHttpServer())
+      .post(BASE_PATH_WAGES_PROCESSOR + '/register-currency-rate')
+      .send(currencyRate)
+      .then((result) => {
+        expect(result.statusCode).toEqual(201);
+        expect(result.body.data.exchangeRate).toEqual(60000.36);
+      });
+  });
 });
