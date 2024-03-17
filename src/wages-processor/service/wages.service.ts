@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import * as sampleData from '../../../test/utils/sample_wage_data.json';
-import { CurrencyRates } from '../entity/currency-rates.entity';
+
 import { EMPLOYEE_DATA_REPOSITORY } from '../repository/employee-data.repository';
 import { CURRENCY_RATES_REPOSITORY } from '../repository/currency-rates.repository';
 import { ACCESS_REQUEST_REPOSITORY } from '../repository/access-request.repository';
@@ -10,6 +10,7 @@ import { AccessRequest } from '../entity/access-request.entity';
 import BigDecimal from 'big.js';
 import { AccessRequestDto } from '../dto/access-request.dto';
 import { RegisterCurrencyDto } from '../dto/register-currency.dto';
+import { CurrencyRate } from '../entity/currency-rate.entity';
 
 @Injectable()
 export class WagesService {
@@ -17,7 +18,7 @@ export class WagesService {
     @Inject(EMPLOYEE_DATA_REPOSITORY)
     private employeeWageDataRepository: Repository<EmployeeData>,
     @Inject(CURRENCY_RATES_REPOSITORY)
-    private currencyRatesRepository: Repository<CurrencyRates>,
+    private currencyRatesRepository: Repository<CurrencyRate>,
     @Inject(ACCESS_REQUEST_REPOSITORY)
     private wageAccessRequestRepository: Repository<AccessRequest>,
   ) {}
@@ -43,6 +44,10 @@ export class WagesService {
       (acc, curr) => acc.plus(curr.requestedAmount),
       new BigDecimal(0),
     );
+    return this.getCurrencyNumber(total);
+  }
+
+  private getCurrencyNumber(total: BigDecimal) {
     return parseFloat(total.toFixed(2));
   }
 
@@ -63,7 +68,7 @@ export class WagesService {
         };
       },
     );
-    const currencyRates: CurrencyRates[] = Object.keys(
+    const currencyRates: CurrencyRate[] = Object.keys(
       sampleData.currencyRates,
     ).map((currency) => {
       return {
@@ -131,12 +136,39 @@ export class WagesService {
       id: undefined,
       requestID: accessRequest.requestID,
       employeeID: accessRequest.employeeID,
-      requestedAmount: parseFloat(accessRequest.requestedAmount.toFixed(2)),
+      requestedAmount: this.getCurrencyNumber(accessRequest.requestedAmount),
       requestedCurrency: accessRequest.requestedCurrency,
       employeeWageData: employeeWageData,
     };
     return this.wageAccessRequestRepository.save(newAccessRequest);
   }
 
-  async registerCurrencyRate(registerCurrency: RegisterCurrencyDto) {}
+  async registerCurrencyRate(
+    registerCurrency: RegisterCurrencyDto,
+  ): Promise<CurrencyRate> {
+    let currencyToRegister: CurrencyRate;
+    // Format the conversion type
+    const conversionTypeFormat = `${registerCurrency.firstConversionTypeSymbol}_${registerCurrency.secondConversionTypeSymbol}`;
+    // Check if the currency rate already exists
+    const currencyRateExists = await this.currencyRatesRepository.findOne({
+      where: {
+        conversionType: conversionTypeFormat,
+      },
+    });
+    if (currencyRateExists) {
+      // Update the currency rate
+      currencyRateExists.exchangeRate = this.getCurrencyNumber(
+        registerCurrency.exchangeRate,
+      );
+      currencyToRegister = currencyRateExists;
+    } else {
+      currencyToRegister = {
+        id: undefined,
+        conversionType: conversionTypeFormat,
+        exchangeRate: this.getCurrencyNumber(registerCurrency.exchangeRate),
+      };
+    }
+    // Save or update the currency rate
+    return this.currencyRatesRepository.save(currencyToRegister);
+  }
 }

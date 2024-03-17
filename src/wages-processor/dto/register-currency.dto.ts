@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsCurrency, IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 import BigDecimal from 'big.js';
 
 export class RegisterCurrencyDto {
@@ -16,6 +16,5 @@ export class RegisterCurrencyDto {
       'The exchange rate between the first and second conversion type symbols.',
   })
   @IsNumber()
-  @IsCurrency()
   exchangeRate: BigDecimal;
 }
