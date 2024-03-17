@@ -155,10 +155,6 @@ export class WagesService {
     accessRequest: AccessRequestDto,
     employeeWageData: EmployeeData,
   ): Promise<BigDecimal> {
-    // Get the requested amount
-    const requestedAmount = new BigDecimal(
-      this.sumRequestedAmounts(employeeWageData.wageAccessRequest),
-    );
     // Get the balance currency type and the requested currency type
     const balanceCurrencyType = employeeWageData.currency;
     const requestedCurrencyType = accessRequest.requestedCurrency;
