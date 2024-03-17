@@ -163,6 +163,74 @@ describe('Wages API (e2e)', () => {
       });
   });
 
+  it('Should create one access request and check if employee data have insufficient balance', () => {
+    return request(app.getHttpServer())
+      .post(BASE_PATH_WAGES_PROCESSOR + '/access-request')
+      .send({
+        requestID: 'R04',
+        employeeID: 'E01',
+        requestedAmount: 20000,
+        requestedCurrency: 'USD',
+      })
+      .then((result) => {
+        expect(result.statusCode).toEqual(400);
+        expect(result.body.data).toEqual(
+          'Insufficient balance to approve the request',
+        );
+      });
+  });
+
+  it('Should create one access request and check if employee data have insufficient balance including decimals', () => {
+    return request(app.getHttpServer())
+      .post(BASE_PATH_WAGES_PROCESSOR + '/access-request')
+      .send({
+        requestID: 'R04',
+        employeeID: 'E01',
+        requestedAmount: 1200.1,
+        requestedCurrency: 'USD',
+      })
+      .then((result) => {
+        expect(result.statusCode).toEqual(400);
+        expect(result.body.data).toEqual(
+          'Insufficient balance to approve the request',
+        );
+      });
+  });
+
+  it('Should create one access request and check if employee data have insufficient balance when making the conversion', () => {
+    return request(app.getHttpServer())
+      .post(BASE_PATH_WAGES_PROCESSOR + '/access-request')
+      .send({
+        requestID: 'R04',
+        employeeID: 'E01',
+        requestedAmount: 1200001,
+        requestedCurrency: 'ARS',
+      })
+      .then((result) => {
+        expect(result.statusCode).toEqual(400);
+        expect(result.body.data).toEqual(
+          'Insufficient balance when making the conversion',
+        );
+      });
+  });
+
+  it('Should create one access request and check if employee data have insufficient balance when making the conversion including decimals', () => {
+    return request(app.getHttpServer())
+      .post(BASE_PATH_WAGES_PROCESSOR + '/access-request')
+      .send({
+        requestID: 'R04',
+        employeeID: 'E01',
+        requestedAmount: 1200000.1,
+        requestedCurrency: 'ARS',
+      })
+      .then((result) => {
+        expect(result.statusCode).toEqual(400);
+        expect(result.body.data).toEqual(
+          'Insufficient balance when making the conversion',
+        );
+      });
+  });
+
   it('Should register a new currency update in the price', async () => {
     const currencyRate = {
       firstConversionTypeSymbol: 'USD',

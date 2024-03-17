@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { WagesService } from '../service/wages.service';
 import { AccessRequestDto } from '../dto/access-request.dto';
 import { ResponseApiDto } from '../dto/response-api.dto';
@@ -32,10 +40,13 @@ export class WagesController {
         data: await this.appService.getBalance(employeeId),
       };
     } catch (error) {
-      return {
-        message: 'Error retrieving balance',
-        data: error.message,
-      };
+      throw new HttpException(
+        {
+          message: 'Error retrieving balance',
+          data: error.message,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -58,10 +69,13 @@ export class WagesController {
         data: await this.appService.requestAccess(accessRequest),
       };
     } catch (error) {
-      return {
-        message: 'Error requesting access',
-        data: error.message,
-      };
+      throw new HttpException(
+        {
+          message: 'Error requesting access',
+          data: error.message,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -84,10 +98,13 @@ export class WagesController {
         data: await this.appService.registerCurrencyRate(registerCurrency),
       };
     } catch (error) {
-      return {
-        message: 'Error registering currency rate',
-        data: error.message,
-      };
+      throw new HttpException(
+        {
+          message: 'Error registering currency rate',
+          data: error.message,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -114,10 +131,13 @@ export class WagesController {
         }),
       };
     } catch (error) {
-      return {
-        message: 'Error registering employee data',
-        data: error.message,
-      };
+      throw new HttpException(
+        {
+          message: 'Error registering employee data',
+          data: error.message,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 }

@@ -57,6 +57,14 @@ export class WagesService {
         accessRequest,
         employeeWageData,
       );
+    const totalAvailableForAccessRequest = this.getCurrencyNumber(
+      new BigDecimal(
+        employeeWageData.totalAvailableForAccessRequest.toString(),
+      ).sub(requestedAmountInBaseCurrencyToRegister),
+    );
+    if (totalAvailableForAccessRequest < 0) {
+      throw new Error('Insufficient balance to approve the request');
+    }
     // Register the requested amount
     const newAccessRequest: AccessRequest = {
       id: undefined,
@@ -70,11 +78,8 @@ export class WagesService {
       newAccessRequest,
     );
     // Update the balance for total available for access request
-    employeeWageData.totalAvailableForAccessRequest = this.getCurrencyNumber(
-      new BigDecimal(
-        employeeWageData.totalAvailableForAccessRequest.toString(),
-      ).sub(requestedAmountInBaseCurrencyToRegister),
-    );
+    employeeWageData.totalAvailableForAccessRequest =
+      totalAvailableForAccessRequest;
     // Save the updated employee wage data
     await this.employeeWageDataRepository.save(employeeWageData);
     return requestRecord;
