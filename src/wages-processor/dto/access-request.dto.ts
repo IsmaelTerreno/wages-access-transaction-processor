@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString } from 'class-validator';
+import { IsCurrency, IsNumber, IsString } from 'class-validator';
 import BigDecimal from 'big.js';
 
 export class AccessRequestDto {
@@ -18,6 +18,7 @@ export class AccessRequestDto {
       "The amount requested for this access request that would be deducted from the employee's balance.",
   })
   @IsNumber()
+  @IsCurrency()
   requestedAmount: BigDecimal;
 
   @ApiProperty({
