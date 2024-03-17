@@ -3,6 +3,7 @@ import { WagesService } from '../service/wages.service';
 import { AccessRequestDto } from '../dto/access-request.dto';
 import { ResponseApiDto } from '../dto/response-api.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { RegisterCurrencyDto } from '../dto/register-currency.dto';
 
 @ApiTags('Wages Processor')
 @Controller('/api/v1/wages')
@@ -95,11 +96,13 @@ export class WagesController {
     type: ResponseApiDto,
   })
   @Post('/register-currency-rate')
-  async registerCurrencyRate(): Promise<ResponseApiDto> {
+  async registerCurrencyRate(
+    @Body() registerCurrency: RegisterCurrencyDto,
+  ): Promise<ResponseApiDto> {
     try {
       return {
         message: 'Currency rate registered successfully',
-        data: await this.appService.registerCurrencyRate(),
+        data: await this.appService.registerCurrencyRate(registerCurrency),
       };
     } catch (error) {
       return {

@@ -9,6 +9,7 @@ import { EmployeeData } from '../entity/employee-data.entity';
 import { AccessRequest } from '../entity/access-request.entity';
 import BigDecimal from 'big.js';
 import { AccessRequestDto } from '../dto/access-request.dto';
+import { RegisterCurrencyDto } from '../dto/register-currency.dto';
 
 @Injectable()
 export class WagesService {
@@ -137,5 +138,5 @@ export class WagesService {
     return this.wageAccessRequestRepository.save(newAccessRequest);
   }
 
-  async registerCurrencyRate() {}
+  async registerCurrencyRate(registerCurrency: RegisterCurrencyDto) {}
 }
