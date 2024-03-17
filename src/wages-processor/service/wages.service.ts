@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import * as sampleData from '../../../test/utils/sample_wage_data.json';
 
 import { EMPLOYEE_DATA_REPOSITORY } from '../repository/employee-data.repository';
 import { CURRENCY_RATES_REPOSITORY } from '../repository/currency-rates.repository';
@@ -38,69 +37,6 @@ export class WagesService {
 
   private getCurrencyNumber(total: BigDecimal) {
     return parseFloat(total.toFixed(2));
-  }
-
-  async loadInitialData(): Promise<void> {
-    // Clean up database data first. This is for testing purposes only and should not be used in production.
-    await this.wageAccessRequestRepository.delete({});
-    await this.employeeWageDataRepository.delete({});
-    await this.currencyRatesRepository.delete({});
-    // Read file json sample_wage_data.json
-    const employeeList: EmployeeData[] = sampleData.employeeWageData.map(
-      (employeeData) => {
-        return {
-          id: undefined,
-          employeeID: employeeData.employeeID,
-          totalEarnedWages: employeeData.totalEarnedWages,
-          totalAvailableForAccessRequest: employeeData.totalEarnedWages,
-          currency: employeeData.currency,
-          wageAccessRequest: [],
-        };
-      },
-    );
-    const currencyRates: CurrencyRate[] = Object.keys(
-      sampleData.currencyRates,
-    ).map((currency) => {
-      return {
-        id: undefined,
-        conversionType: currency,
-        exchangeRate: sampleData.currencyRates[currency],
-      };
-    });
-    const accessRequestsList: AccessRequest[] =
-      sampleData.wageAccessRequests.map((accessRequest) => {
-        return {
-          id: undefined,
-          requestID: accessRequest.requestID,
-          employeeID: accessRequest.employeeID,
-          requestedAmount: accessRequest.requestedAmount,
-          requestedCurrency: accessRequest.requestedCurrency,
-          employeeWageData: undefined,
-        };
-      });
-    for (const currencyRate of currencyRates) {
-      const savedCurrencyRate = await this.currencyRatesRepository.save(
-        currencyRate,
-      );
-      console.log('Saved currency rate:', savedCurrencyRate);
-    }
-    for (const employee of employeeList) {
-      const savedEmployee = await this.employeeWageDataRepository.save(
-        employee,
-      );
-      const accessRequests = accessRequestsList.filter(
-        (wageAccessRequest) =>
-          wageAccessRequest.employeeID === employee.employeeID,
-      );
-      for (const accessRequest of accessRequests) {
-        accessRequest.employeeWageData = savedEmployee;
-        const savedAccessRequest = await this.wageAccessRequestRepository.save(
-          accessRequest,
-        );
-        console.log('Saved wage access request:', savedAccessRequest);
-      }
-      console.log('Saved employee:', savedEmployee);
-    }
   }
 
   async requestAccess(accessRequest: AccessRequestDto) {

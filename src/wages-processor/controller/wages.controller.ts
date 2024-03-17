@@ -12,30 +12,6 @@ export class WagesController {
 
   @ApiOperation({
     summary:
-      'Load initial data for testing purposes, also will clean up the database data so take care when using it and should not be used in production.',
-  })
-  @ApiResponse({
-    description:
-      'Message response result from API when load initial data for testing purposes.',
-    type: ResponseApiDto,
-  })
-  @Get('/load-initial-data')
-  async loadInitialData(): Promise<ResponseApiDto> {
-    try {
-      return {
-        message: 'Initial data loaded successfully for testing purposes',
-        data: await this.appService.loadInitialData(),
-      };
-    } catch (error) {
-      return {
-        message: 'Error loading initial data',
-        data: error.message,
-      };
-    }
-  }
-
-  @ApiOperation({
-    summary:
       "Calculate the real-time balance of an employee's earned wages, accounting for any previous wage access requests.",
   })
   @ApiResponse({
