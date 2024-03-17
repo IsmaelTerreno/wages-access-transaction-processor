@@ -36,14 +36,6 @@ export class WagesService {
     return employeeWageData.totalAvailableForAccessRequest;
   }
 
-  private sumRequestedAmounts(requests: AccessRequest[]): number {
-    const total = requests.reduce(
-      (acc, curr) => acc.plus(curr.requestedAmount),
-      new BigDecimal(0),
-    );
-    return this.getCurrencyNumber(total);
-  }
-
   private getCurrencyNumber(total: BigDecimal) {
     return parseFloat(total.toFixed(2));
   }
