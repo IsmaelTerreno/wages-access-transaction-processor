@@ -9,7 +9,10 @@ import * as sampleData from '../test/utils/sample_wage_data.json';
 import { AccessRequest } from '../src/wages-processor/entity/access-request.entity';
 import { CurrencyRate } from '../src/wages-processor/entity/currency-rate.entity';
 import { EmployeeData } from '../src/wages-processor/entity/employee-data.entity';
-
+import { Repository } from 'typeorm';
+import { BASE_PATH_WAGES_PROCESSOR } from '../src/wages-processor/controller/wages.controller';
+// Jest timeout is 5 seconds by default, so we need to increase it to 30 seconds to avoid timeout errors.
+jest.setTimeout(30000);
 describe('Wages API (e2e)', () => {
   let app: INestApplication;
 
@@ -20,9 +23,9 @@ describe('Wages API (e2e)', () => {
    * @param currencyRatesRepository
    */
   async function initializeDatabase(
-    wageAccessRequestRepository: any,
-    employeeWageDataRepository: any,
-    currencyRatesRepository: any,
+    wageAccessRequestRepository: Repository<any>,
+    employeeWageDataRepository: Repository<any>,
+    currencyRatesRepository: Repository<any>,
   ) {
     // Clean up database data first. This is for testing purposes only and should not be used in production.
     await wageAccessRequestRepository.delete({});
@@ -62,10 +65,7 @@ describe('Wages API (e2e)', () => {
         };
       });
     for (const currencyRate of currencyRates) {
-      const savedCurrencyRate = await currencyRatesRepository.save(
-        currencyRate,
-      );
-      console.log('Saved currency rate:', savedCurrencyRate);
+      await currencyRatesRepository.save(currencyRate);
     }
     for (const employee of employeeList) {
       const savedEmployee = await employeeWageDataRepository.save(employee);
@@ -75,12 +75,8 @@ describe('Wages API (e2e)', () => {
       );
       for (const accessRequest of accessRequests) {
         accessRequest.employeeWageData = savedEmployee;
-        const savedAccessRequest = await wageAccessRequestRepository.save(
-          accessRequest,
-        );
-        console.log('Saved wage access request:', savedAccessRequest);
+        await wageAccessRequestRepository.save(accessRequest);
       }
-      console.log('Saved employee:', savedEmployee);
     }
   }
 
@@ -107,11 +103,62 @@ describe('Wages API (e2e)', () => {
     );
   });
 
-  it('/ (GET)', () => {
-    //
+  it('Should create one access request for one existing employee', () => {
+    const accessRequest = {
+      requestID: 'R04',
+      employeeID: 'E01',
+      requestedAmount: 1000,
+      requestedCurrency: 'ARS',
+    };
     return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+      .post(BASE_PATH_WAGES_PROCESSOR + '/access-request')
+      .send(accessRequest)
+      .then((result) => {
+        expect(result.statusCode).toEqual(201);
+      });
+  });
+
+  it('Should create one access request and see the affected available balance', () => {
+    const accessRequest = {
+      requestID: 'R04',
+      employeeID: 'E01',
+      requestedAmount: 1000,
+      requestedCurrency: 'ARS',
+    };
+    return request(app.getHttpServer())
+      .post(BASE_PATH_WAGES_PROCESSOR + '/access-request')
+      .send(accessRequest)
+      .then((result) => {
+        expect(result.statusCode).toEqual(201);
+        expect(result.body.data.requestedAmount).toEqual(1000);
+        expect(
+          result.body.data.employeeWageData.totalAvailableForAccessRequest,
+        ).toEqual(1190);
+      });
+  });
+
+  it('Should create 3 access request and see the affected available balance', async () => {
+    const accessRequest = {
+      requestID: 'R04',
+      employeeID: 'E01',
+      requestedAmount: 1000,
+      requestedCurrency: 'ARS',
+    };
+    await request(app.getHttpServer())
+      .post(BASE_PATH_WAGES_PROCESSOR + '/access-request')
+      .send(accessRequest);
+    await request(app.getHttpServer())
+      .post(BASE_PATH_WAGES_PROCESSOR + '/access-request')
+      .send(accessRequest);
+    await request(app.getHttpServer())
+      .post(BASE_PATH_WAGES_PROCESSOR + '/access-request')
+      .send(accessRequest)
+      .then((result) => {
+        expect(result.statusCode).toEqual(201);
+        expect(result.body.data.requestedAmount).toEqual(1000);
+        expect(
+          result.body.data.employeeWageData.totalAvailableForAccessRequest,
+        ).toEqual(1170);
+      });
   });
 });

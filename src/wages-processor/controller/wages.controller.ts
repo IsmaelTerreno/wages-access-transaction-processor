@@ -5,8 +5,10 @@ import { ResponseApiDto } from '../dto/response-api.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RegisterCurrencyDto } from '../dto/register-currency.dto';
 
+export const BASE_PATH_WAGES_PROCESSOR = '/api/v1/wages';
+
 @ApiTags('Wages Processor')
-@Controller('/api/v1/wages')
+@Controller(BASE_PATH_WAGES_PROCESSOR)
 export class WagesController {
   constructor(private readonly appService: WagesService) {}
 
