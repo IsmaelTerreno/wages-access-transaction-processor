@@ -12,6 +12,9 @@ export class EmployeeData {
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
   totalEarnedWages: number;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
+  totalAvailableForAccessRequest: number;
+
   @Column({ nullable: false })
   currency: string;
 

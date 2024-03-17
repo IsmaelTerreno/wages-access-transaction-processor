@@ -27,16 +27,13 @@ export class WagesService {
     const employeeWageData: EmployeeData =
       await this.employeeWageDataRepository.findOne({
         where: {
-          id: employeeID,
+          employeeID: employeeID,
         },
         relations: {
           wageAccessRequest: true,
         },
       });
-    const requestedAmount = this.sumRequestedAmounts(
-      employeeWageData.wageAccessRequest,
-    );
-    return employeeWageData.totalEarnedWages - (requestedAmount || 0);
+    return employeeWageData.totalAvailableForAccessRequest;
   }
 
   private sumRequestedAmounts(requests: AccessRequest[]): number {
@@ -63,6 +60,7 @@ export class WagesService {
           id: undefined,
           employeeID: employeeData.employeeID,
           totalEarnedWages: employeeData.totalEarnedWages,
+          totalAvailableForAccessRequest: employeeData.totalEarnedWages,
           currency: employeeData.currency,
           wageAccessRequest: [],
         };
@@ -114,6 +112,7 @@ export class WagesService {
   }
 
   async requestAccess(accessRequest: AccessRequestDto) {
+    // Find the employee wage data
     const employeeWageData: EmployeeData =
       await this.employeeWageDataRepository.findOne({
         where: {
@@ -123,15 +122,13 @@ export class WagesService {
           wageAccessRequest: true,
         },
       });
-    const requestedAmount = this.sumRequestedAmounts(
-      employeeWageData.wageAccessRequest,
-    );
-    const balance = BigDecimal(
-      employeeWageData.totalEarnedWages - requestedAmount,
-    );
-    if (balance < accessRequest.requestedAmount) {
-      throw new Error('Insufficient balance');
-    }
+    // Process the requested amount in base currency
+    const requestedAmountInBaseCurrencyToRegister: BigDecimal =
+      await this.processRequestAmountInBaseCurrency(
+        accessRequest,
+        employeeWageData,
+      );
+    // Register the requested amount
     const newAccessRequest: AccessRequest = {
       id: undefined,
       requestID: accessRequest.requestID,
@@ -140,7 +137,64 @@ export class WagesService {
       requestedCurrency: accessRequest.requestedCurrency,
       employeeWageData: employeeWageData,
     };
-    return this.wageAccessRequestRepository.save(newAccessRequest);
+    const requestRecord = await this.wageAccessRequestRepository.save(
+      newAccessRequest,
+    );
+    // Update the balance for total available for access request
+    employeeWageData.totalAvailableForAccessRequest = this.getCurrencyNumber(
+      new BigDecimal(
+        employeeWageData.totalAvailableForAccessRequest.toString(),
+      ).sub(requestedAmountInBaseCurrencyToRegister),
+    );
+    // Save the updated employee wage data
+    await this.employeeWageDataRepository.save(employeeWageData);
+    return requestRecord;
+  }
+
+  private async processRequestAmountInBaseCurrency(
+    accessRequest: AccessRequestDto,
+    employeeWageData: EmployeeData,
+  ): Promise<BigDecimal> {
+    // Get the requested amount
+    const requestedAmount = new BigDecimal(
+      this.sumRequestedAmounts(employeeWageData.wageAccessRequest),
+    );
+    // Get the balance currency type and the requested currency type
+    const balanceCurrencyType = employeeWageData.currency;
+    const requestedCurrencyType = accessRequest.requestedCurrency;
+    // Check if the balance currency type is different from the requested currency type
+    if (balanceCurrencyType !== requestedCurrencyType) {
+      // Find the requested currency rate
+      const requestedCurrencyRate = await this.findCurrencyRate(
+        this.getConversionTypeFormat(
+          requestedCurrencyType,
+          balanceCurrencyType,
+        ),
+      );
+      // Check if the currency rate exists to make possible the conversion
+      if (!requestedCurrencyRate) {
+        throw new Error(
+          'Currency rate not found so conversion is not possible',
+        );
+      }
+      // Convert the requested amount to the balance currency type
+      const requestedAmountInBalanceCurrency = new BigDecimal(
+        accessRequest.requestedAmount,
+      ).mul(requestedCurrencyRate.exchangeRate);
+      // Get the balance from employee wage data
+      const totalAvailableForAccessRequest = BigDecimal(
+        employeeWageData.totalAvailableForAccessRequest.toString(),
+      );
+      // Check if the balance is less than the requested amount
+      if (requestedAmountInBalanceCurrency > totalAvailableForAccessRequest) {
+        throw new Error('Insufficient balance when making the conversion');
+      }
+      // Then return the requested amount in the balance currency type found in the conversion
+      return requestedAmountInBalanceCurrency;
+    } else {
+      // Then return the requested amount in the balance currency type directly from request
+      return accessRequest.requestedAmount;
+    }
   }
 
   async registerCurrencyRate(
@@ -148,7 +202,10 @@ export class WagesService {
   ): Promise<CurrencyRate> {
     let currencyToRegister: CurrencyRate;
     // Format the conversion type
-    const conversionTypeFormat = `${registerCurrency.firstConversionTypeSymbol}_${registerCurrency.secondConversionTypeSymbol}`;
+    const conversionTypeFormat = this.getConversionTypeFormat(
+      registerCurrency.firstConversionTypeSymbol,
+      registerCurrency.secondConversionTypeSymbol,
+    );
     // Check if the currency rate already exists
     const currencyRateExists = await this.currencyRatesRepository.findOne({
       where: {
@@ -170,5 +227,20 @@ export class WagesService {
     }
     // Save or update the currency rate
     return this.currencyRatesRepository.save(currencyToRegister);
+  }
+
+  private getConversionTypeFormat(
+    firstConversionTypeSymbol: string,
+    secondConversionTypeSymbol: string,
+  ): string {
+    return `${firstConversionTypeSymbol}_${secondConversionTypeSymbol}`;
+  }
+
+  async findCurrencyRate(conversionType: string): Promise<CurrencyRate> {
+    return this.currencyRatesRepository.findOne({
+      where: {
+        conversionType,
+      },
+    });
   }
 }
