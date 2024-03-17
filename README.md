@@ -62,9 +62,10 @@ $ npm run test:cov
 
 ## Documentation
 
-The app already contains a swagger documentation for developers, you can access it by the following URL:
+The app already contains a swagger documentation for developers, you can access it by the following
+URL:`http://localhost:{Configured port}/doc`
 
-`http://localhost:{Configured port}/doc`
+The default port is 6030, so the URL will be `http://localhost:6030/doc` in that case.
 
 ## Support
 
@@ -73,9 +74,7 @@ advance for taking the time to review this project.
 
 ## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- Author - [Carlos Ismael Terreno](https://github.com/IsmaelTerreno)
 
 ## License
 

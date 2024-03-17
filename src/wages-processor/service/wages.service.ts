@@ -46,6 +46,10 @@ export class WagesService {
   }
 
   async loadInitialData(): Promise<void> {
+    // Clean up database data first. This is for testing purposes only and should not be used in production.
+    await this.wageAccessRequestRepository.delete({});
+    await this.employeeWageDataRepository.delete({});
+    await this.currencyRatesRepository.delete({});
     // Read file json sample_wage_data.json
     const employeeList: EmployeeData[] = sampleData.employeeWageData.map(
       (employeeData) => {
