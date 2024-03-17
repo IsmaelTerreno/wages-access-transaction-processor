@@ -28,13 +28,37 @@ currency conversion rates.
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository was used on this project.
 
-## Installation
+## Running the project with NPM
+
+### Prerequisites
+
+- Node.js
+- PostgreSQL running on port 5432
+- .env file with the following variables:
+
+```bash
+# Database
+HOST_DB_CONFIG=localhost
+PORT_DB_CONFIG=5432
+DIALECT_DB_CONFIG=postgres
+PROTOCOL_DB_CONFIG=postgres
+DATABASE_NAME_DB_CONFIG=wages-processor
+LOG_DEBUG_DB_CONFIG=true
+USER_NAME_DB_CONFIG=postgres
+USER_PASSWORD_DB_CONFIG=postgres
+```
+
+Also, you can rename the file `sample.local.dev.env` to `.env` and fill the variables with the correct values.
+
+## Running the app with npm
+
+1. Install the dependencies
 
 ```bash
 $ npm install
 ```
 
-## Running the app
+2. Install the dependencies
 
 ```bash
 # development
@@ -60,7 +84,41 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Documentation
+## Running the project with Docker
+
+### Prerequisites
+
+- Docker running on your machine
+
+### Running the app with Docker compose
+
+1. Build the docker image
+
+```bash
+$ docker-compose build
+```
+
+2. Run the docker image
+
+```bash
+$ docker-compose up
+```
+
+3. Access the app on your browser
+
+```bash
+http://localhost:6030
+```
+
+### Stopping the app with Docker compose
+
+1. Stop the docker image
+
+```bash
+$ docker-compose down
+```
+
+## Documentation for the API
 
 The app already contains a swagger documentation for developers, you can access it by the following
 URL:`http://localhost:{Configured port}/doc`
