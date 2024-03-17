@@ -227,4 +227,19 @@ describe('Wages API (e2e)', () => {
         expect(result.body.data.exchangeRate).toEqual(60000.36);
       });
   });
+
+  it('Should register a new employee data', async () => {
+    await request(app.getHttpServer())
+      .post(BASE_PATH_WAGES_PROCESSOR + '/register-employee-data')
+      .send({
+        employeeID: 'E05',
+        totalEarnedWages: 12000,
+        currency: 'USD',
+      })
+      .then((result) => {
+        expect(result.statusCode).toEqual(201);
+        expect(result.body.data.totalEarnedWages).toEqual(12000);
+        expect(result.body.data.totalAvailableForAccessRequest).toEqual(12000);
+      });
+  });
 });

@@ -10,6 +10,7 @@ import BigDecimal from 'big.js';
 import { AccessRequestDto } from '../dto/access-request.dto';
 import { RegisterCurrencyDto } from '../dto/register-currency.dto';
 import { CurrencyRate } from '../entity/currency-rate.entity';
+import { RegisterEmployeeDataDto } from '../dto/register-employee-data.dto';
 
 @Injectable()
 export class WagesService {
@@ -165,6 +166,17 @@ export class WagesService {
       where: {
         conversionType,
       },
+    });
+  }
+
+  async registerEmployeeData(
+    registerEmployeeDataDto: RegisterEmployeeDataDto,
+  ): Promise<EmployeeData> {
+    return this.employeeWageDataRepository.save({
+      employeeID: registerEmployeeDataDto.employeeID,
+      totalEarnedWages: registerEmployeeDataDto.totalEarnedWages,
+      totalAvailableForAccessRequest: registerEmployeeDataDto.totalEarnedWages,
+      currency: registerEmployeeDataDto.currency,
     });
   }
 }

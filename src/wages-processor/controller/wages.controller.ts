@@ -4,6 +4,7 @@ import { AccessRequestDto } from '../dto/access-request.dto';
 import { ResponseApiDto } from '../dto/response-api.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RegisterCurrencyDto } from '../dto/register-currency.dto';
+import { RegisterEmployeeDataDto } from '../dto/register-employee-data.dto';
 
 export const BASE_PATH_WAGES_PROCESSOR = '/api/v1/wages';
 
@@ -85,6 +86,36 @@ export class WagesController {
     } catch (error) {
       return {
         message: 'Error registering currency rate',
+        data: error.message,
+      };
+    }
+  }
+
+  @ApiOperation({
+    summary:
+      'Register the employee data, which will be used to calculate the real-time balance and to approve wage access requests.',
+  })
+  @ApiResponse({
+    description:
+      'Message response result from API when register the employee data.',
+    type: ResponseApiDto,
+  })
+  @Post('/register-employee-data')
+  async registerEmployeeData(
+    @Body() registerEmployeeDataDto: RegisterEmployeeDataDto,
+  ) {
+    try {
+      return {
+        message: 'Employee data registered successfully',
+        data: await this.appService.registerEmployeeData({
+          employeeID: registerEmployeeDataDto.employeeID,
+          totalEarnedWages: registerEmployeeDataDto.totalEarnedWages,
+          currency: registerEmployeeDataDto.currency,
+        }),
+      };
+    } catch (error) {
+      return {
+        message: 'Error registering employee data',
         data: error.message,
       };
     }
