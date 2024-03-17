@@ -121,9 +121,10 @@ $ docker-compose down
 ## Documentation for the API
 
 The app already contains a swagger documentation for developers, you can access it by the following
-URL:`http://localhost:{Configured port}/doc`
+URL:
+`http://localhost:{Configured SERVER_PORT_LISTENING in env var}/doc`
 
-The default port is 6030, so the URL will be `http://localhost:6030/doc` in that case.
+The default port is 6030, so the URL will be [http://localhost:6030/doc](http://localhost:6030/doc) in that case.
 
 ## Support
 
