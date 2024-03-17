@@ -8,8 +8,18 @@ export class WagesController {
   constructor(private readonly appService: WagesService) {}
 
   @Get('/load-initial-data')
-  async loadInitialData(): Promise<void> {
-    return await this.appService.loadInitialData();
+  async loadInitialData(): Promise<ResponseApiDto> {
+    try {
+      return {
+        message: 'Initial data loaded successfully for testing purposes',
+        data: await this.appService.loadInitialData(),
+      };
+    } catch (error) {
+      return {
+        message: 'Error loading initial data',
+        data: error.message,
+      };
+    }
   }
 
   @Get('/balance/:employeeId')
@@ -17,10 +27,9 @@ export class WagesController {
     @Param('employeeId') employeeId: string,
   ): Promise<ResponseApiDto> {
     try {
-      const balance = await this.appService.getBalance(employeeId);
       return {
         message: 'Balance retrieved successfully',
-        data: balance,
+        data: await this.appService.getBalance(employeeId),
       };
     } catch (error) {
       return {
@@ -35,10 +44,9 @@ export class WagesController {
     @Body() accessRequest: AccessRequestDto,
   ): Promise<ResponseApiDto> {
     try {
-      const savedRequest = await this.appService.requestAccess(accessRequest);
       return {
         message: 'Access requested successfully',
-        data: savedRequest,
+        data: await this.appService.requestAccess(accessRequest),
       };
     } catch (error) {
       return {
