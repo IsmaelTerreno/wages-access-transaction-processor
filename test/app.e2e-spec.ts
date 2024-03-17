@@ -96,6 +96,7 @@ describe('Wages API (e2e)', () => {
     const wageAccessRequestRepository = moduleFixture.get(
       ACCESS_REQUEST_REPOSITORY,
     );
+    // Initialize the database with sample data and clean up the database data for isolated testing.
     await initializeDatabase(
       wageAccessRequestRepository,
       employeeWageDataRepository,
