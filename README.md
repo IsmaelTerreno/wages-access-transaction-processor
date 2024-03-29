@@ -17,15 +17,6 @@ currency conversion rates.
 | Output should be a JSON file with the results of each wage access request, including approval status and remaining balance.                            | Currency Rates: Conversion rates between USD and local currencies.                                  | Request Processing: Determine if a wage access request can be approved based on the available balance and the requested amount.                          | Currency conversion rates should be applied accurately, considering the rates might fluctuate daily. |
 |                                                                                                                                                        | Wage Access Requests: Includes request ID, employee ID, requested amount, and requested currency.   | Currency Conversion: If a request is made in a currency different from the earned wages, convert the requested amount using the provided currency rates. |                                                                                                      |
 
-### Evaluation Criteria
-
-* Correctness: The solution should accurately process all wage access requests, correctly applying balance checks and
-  currency conversions.
-* Code Quality: Code should be clean, well-commented, and organized. Proper error handling and validation of input data
-  are expected.
-* Efficiency: The solution should handle data efficiently, with consideration for time and space complexity, especially
-  as the size of the dataset grows.
-
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository was used on this project.
 
 ## Running the project with NPM
